@@ -1,5 +1,7 @@
 package com.evolution.datagen.model
 
+import cats.effect.IO
+import cats.effect.concurrent.Ref
 import cats.syntax.functor._
 import cats.syntax.option._
 import com.evolution.datagen.model.SpecModel.DataSpec.{FieldSpec, ObjectSpec}
@@ -9,12 +11,25 @@ import io.circe.yaml.parser
 import io.circe.{Codec, Decoder, Encoder}
 
 import java.time.Instant
+import scala.io.Source
 
 object SpecModel {
 
   final case class GeneratorSpec(definitions: List[ObjectSpec])
 
   object GeneratorSpec {
+    def of(yamlPath: String): IO[ObjectSpec] = {
+
+      def readConfig =
+        GeneratorSpec.fromYaml(
+          Source.fromResource(yamlPath).getLines().mkString(System.lineSeparator)
+        )
+
+      for {
+        genSpec <- Ref.of[IO, GeneratorSpec](readConfig)
+        dataGen <- genSpec.get.map(_.definitions.head)
+      } yield dataGen
+    }
 
     def fromYaml(yaml: String): GeneratorSpec = {
       import Protocol._

@@ -1,11 +1,11 @@
 package com.evolution.datagen
 
 import java.util.concurrent.TimeUnit
-
 import cats.effect.concurrent.Semaphore
 import cats.effect.{ExitCode, IO, IOApp}
 import com.evolution.datagen.generator.{Gen, RateLimiter}
 import com.evolution.datagen.model.DataModel.ObjectField
+import com.evolution.datagen.model.SpecModel.GeneratorSpec
 
 object GeneratorApp extends IOApp {
 
@@ -16,10 +16,10 @@ object GeneratorApp extends IOApp {
   def process: IO[Unit] = {
     val eventsNumber = 1000000
     for {
-      gen         <- Gen.of("data_spec_example.yaml")
+      dataSpec    <- GeneratorSpec.of("data_spec_example.yaml")
       clock_start <- timer.clock.monotonic(TimeUnit.MILLISECONDS)
       semaphore   <- Semaphore[IO](eventsNumber)
-      rateLimitedFunction = RateLimiter.of(semaphore, () => IO.delay(gen.sample.asInstanceOf[ObjectField].asJson.noSpaces))
+      rateLimitedFunction = RateLimiter.of(semaphore, () => IO.delay(Gen.from(dataSpec).asInstanceOf[ObjectField].asJson.noSpaces))
       allResults  <- Range(0, eventsNumber).toList.parTraverse(_ => rateLimitedFunction)
       clock_end   <- timer.clock.monotonic(TimeUnit.MILLISECONDS)
       _           <- IO(println(s"sample of data ${allResults.take(10).mkString(System.lineSeparator)}."))
