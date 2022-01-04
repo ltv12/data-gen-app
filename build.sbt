@@ -20,6 +20,7 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "cats-effect" % catsEffectVersion,
   "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
+  "com.typesafe" % "config" % "1.4.1",
   "io.circe" %% "circe-yaml" % "0.14.1",
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
