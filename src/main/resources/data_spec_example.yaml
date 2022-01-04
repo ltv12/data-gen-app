@@ -1,7 +1,7 @@
 definitions:
   - name: event
     fields:
-      - name: "Users"
+      - name: "User"
         fields:
           - name: id
             type: uuid

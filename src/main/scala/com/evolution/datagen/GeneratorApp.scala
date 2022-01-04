@@ -30,12 +30,13 @@ object GeneratorApp extends IOApp {
 
   def toFile(data: List[String]): IO[Unit] =
     for {
-      clockStart     <- timer.clock.realTime(TimeUnit.MILLISECONDS)
-      eventsAsString <- IO(data.mkString(System.lineSeparator).getBytes(StandardCharsets.UTF_8))
+      clockStart    <- timer.clock.realTime(TimeUnit.MILLISECONDS)
+      eventsAsBytes <- IO(data.mkString(System.lineSeparator).getBytes(StandardCharsets.UTF_8))
+      _             <- IO(println(s"Average size of event is ${eventsAsBytes.size.toDouble / data.size} bytes"))
       fileName = s"target/tmp/${Instant.ofEpochMilli(clockStart)}-events.json"
-      _              <- IO(Files.write(Paths.get(fileName), eventsAsString))
-      clockEnd       <- timer.clock.realTime(TimeUnit.MILLISECONDS)
-      _              <- IO(println(s"writing of $fileName has taken ${clockEnd - clockStart} milliseconds"))
+      _             <- IO(Files.write(Paths.get(fileName), eventsAsBytes))
+      clockEnd      <- timer.clock.realTime(TimeUnit.MILLISECONDS)
+      _             <- IO(println(s"writing of $fileName has taken ${clockEnd - clockStart} milliseconds"))
     } yield ()
 
   def process(dataSpecIO: IO[DataSpec]): IO[Nothing] = {

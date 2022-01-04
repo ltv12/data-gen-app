@@ -25,9 +25,14 @@ definitions:
 ## Points to improvements
 
 - FieldSpec type parsed only if in lower case (ideally to make case insensitive)
-- Added Complex Types as Map/Array
-- DSL validation.
-
+- Add DSL validation
+- Add more types
+- Complex types Map/List
+- Stateful types as monotonically increasing ID
+- Add sampling for commonly used fields (first name, last name, gender, country and eg)
+- Externalise rate limiter configuration
+- Separate write logic (possibly for different types from Generator App)
+- Much more ….
 ## Aim of the project
 
 Following points is to use techniques and libraries:
