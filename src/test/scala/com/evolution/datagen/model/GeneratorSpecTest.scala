@@ -22,13 +22,11 @@ class GeneratorSpecTest extends AnyFlatSpec with Matchers {
           |""".stripMargin
     val configurationEither = GeneratorSpec.fromYaml(yaml)
 
-    configurationEither.isRight shouldBe true
-    configurationEither
-      .map(_.definitions)
-      .map { definitions =>
-        definitions.size shouldBe 1
-        definitions.head.name shouldBe "registration_event"
-      }
+    getFieldSpec(configurationEither, "event") { fields =>
+      fields should contain theSameElementsAs List(
+        MonotonicIDFieldSpec("uuid")
+      )
+    }
   }
   "fromYaml" should "parse yaml definitions with nested object type" in {
     val yaml =
@@ -193,12 +191,9 @@ class GeneratorSpecTest extends AnyFlatSpec with Matchers {
     }
   }
 
-  private def getFieldSpec(genSpec: Either[Error, GeneratorSpec], definition: String)(check: (List[DataSpec]) => Unit): Unit = {
+  private def getFieldSpec(genSpec: GeneratorSpec, definition: String)(check: (List[DataSpec]) => Unit): Unit = {
 
-    val fields = genSpec match {
-      case Left(e) => throw new Exception(e)
-      case Right(GeneratorSpec(defs)) => defs.find(_.name == definition).map(_.fields)
-    }
+    val fields = genSpec.definitions.find(_.name == definition).map(_.fields)
     check(fields.getOrElse(List.empty))
   }
 }

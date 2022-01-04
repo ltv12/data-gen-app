@@ -1,18 +1,32 @@
 package com.evolution.datagen.generator
 
+import cats.effect.IO
+import cats.effect.concurrent.Ref
+
 import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicLong
-
 import com.evolution.datagen.model.DataModel._
-import com.evolution.datagen.model.SpecModel.DataSpec
+import com.evolution.datagen.model.SpecModel.{DataSpec, GeneratorSpec}
 import com.evolution.datagen.model.SpecModel.DataSpec.FieldSpec._
 import com.evolution.datagen.model.SpecModel.DataSpec.ObjectSpec
 
+import scala.io.Source
 import scala.util.Random
 
 object Gen {
+  def of(yamlPath: String): IO[Gen.Samplable] = {
 
+    def readConfig =
+      GeneratorSpec.fromYaml(
+        Source.fromResource(yamlPath).getLines().mkString(System.lineSeparator)
+      )
+
+    for {
+      genSpec <- Ref.of[IO, GeneratorSpec](readConfig)
+      dataGen <- genSpec.get.map(_.definitions.head).map(Gen.from)
+    } yield dataGen
+  }
   def from(objectSpec: ObjectSpec): Samplable = fromObject(objectSpec)
 
   private def fromObject(dataSpec: DataSpec): Samplable = {

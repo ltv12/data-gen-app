@@ -1,23 +1,27 @@
 package com.evolution.datagen.model
 
-import java.time.Instant
-
 import cats.syntax.functor._
 import cats.syntax.option._
 import com.evolution.datagen.model.SpecModel.DataSpec.{FieldSpec, ObjectSpec}
-import io.circe.syntax._
 import io.circe.parser._
+import io.circe.syntax._
 import io.circe.yaml.parser
-import io.circe.{Codec, Decoder, Encoder, Error}
+import io.circe.{Codec, Decoder, Encoder}
+
+import java.time.Instant
 
 object SpecModel {
 
   final case class GeneratorSpec(definitions: List[ObjectSpec])
 
   object GeneratorSpec {
-    def fromYaml(yaml: String): Either[Error, GeneratorSpec] = {
+
+    def fromYaml(yaml: String): GeneratorSpec = {
       import Protocol._
-      parser.parse(yaml).flatMap(json => decode[GeneratorSpec](json.noSpaces))
+      parser.parse(yaml).flatMap(json => decode[GeneratorSpec](json.noSpaces)) match {
+        case Left(e) => throw new RuntimeException("Failed to read config", e)
+        case Right(spec) => spec
+      }
     }
   }
 
