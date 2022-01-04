@@ -13,7 +13,7 @@ scalacOptions ++= Seq(
 val catsVersion = "2.6.1"
 val catsTaglessVersion = "0.11"
 val catsEffectVersion = "2.5.1"
-val scalaTestVersion = "3.2.7.0"
+val scalaTestVersion = "3.2.10"
 val circeVersion = "0.13.0"
 
 libraryDependencies ++= Seq(
