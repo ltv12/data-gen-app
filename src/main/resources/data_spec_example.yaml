@@ -10,7 +10,7 @@ definitions:
             max_size: 5
           - name: last_name
             type: string
-          - name: type
+          - name: sex
             type: enum
             values: [ "male","female" ]
           - name: has_account
