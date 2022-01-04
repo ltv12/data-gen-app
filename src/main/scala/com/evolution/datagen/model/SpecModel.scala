@@ -1,23 +1,24 @@
 package com.evolution.datagen.model
 
-import cats.effect.IO
-import cats.effect.concurrent.Ref
+import java.time.Instant
+
 import cats.syntax.functor._
 import cats.syntax.option._
+import com.evolution.datagen.generator.Gen
+import com.evolution.datagen.model.DataModel.ObjectField
 import com.evolution.datagen.model.SpecModel.DataSpec.{FieldSpec, ObjectSpec}
 import io.circe.parser._
 import io.circe.syntax._
 import io.circe.yaml.parser
 import io.circe.{Codec, Decoder, Encoder}
 
-import java.time.Instant
 import scala.io.Source
 
 object SpecModel {
-
   final case class GeneratorSpec(definitions: List[ObjectSpec])
 
   object GeneratorSpec {
+
     def load(yamlPath: String): ObjectSpec = {
 
       def readConfig =
@@ -52,6 +53,11 @@ object SpecModel {
       case class BoolFieldSpec(name: String) extends FieldSpec
       case class NumericFieldSpec(name: String, from: Option[Long] = 0L.some, to: Option[Long] = Long.MaxValue.some) extends FieldSpec
       case class TimestampFieldSpec(name: String, from: Option[Long] = Some(Instant.EPOCH.toEpochMilli)) extends FieldSpec
+    }
+
+    implicit class ObjectSpecOps(dataSpec: DataSpec) {
+      def toSample: ObjectField = Gen.toSample(dataSpec).asInstanceOf[ObjectField]
+      def toJsonSample: String = toSample.asJson.noSpaces
     }
 
   }

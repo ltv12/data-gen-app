@@ -8,13 +8,13 @@ import cats.effect.{Concurrent, Timer}
 
 object RateLimiter {
 
-  def use[F[_]: Concurrent: Timer, A, B](semaphore: Semaphore[F], logic: () => F[B]): F[B] = {
+  def use[F[_]: Concurrent: Timer, B](semaphore: Semaphore[F], logic: () => B): F[B] = {
     val F = implicitly[Concurrent[F]]
     val timer = implicitly[Timer[F]]
     for {
       _          <- semaphore.acquire
       timerFiber <- F.start(timer.sleep(1.second))
-      result     <- logic()
+      result     <- F.delay(logic())
       _          <- timerFiber.join
       _          <- semaphore.release
     } yield result

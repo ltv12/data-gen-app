@@ -4,8 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import cats.effect.concurrent.Semaphore
 import cats.effect.{ExitCode, IO, IOApp}
-import com.evolution.datagen.generator.{Gen, RateLimiter}
-import com.evolution.datagen.model.DataModel.ObjectField
+import com.evolution.datagen.generator.{RateLimiter}
 import com.evolution.datagen.model.SpecModel.{DataSpec, GeneratorSpec}
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
@@ -16,14 +15,11 @@ import com.typesafe.config.{Config, ConfigFactory}
 object GeneratorApp extends IOApp {
 
   import cats.syntax.parallel._
-  import com.evolution.datagen.model.DataModel.Protocol._
-  import io.circe.syntax._
-
   def generateData(spec: DataSpec)(implicit appConfig: Config): IO[List[String]] = {
     for {
       clockStart  <- timer.clock.realTime(TimeUnit.MILLISECONDS)
       semaphore   <- Semaphore[IO](appConfig.getInt("rate.events.perSecond"))
-      rateLimitedFunction = RateLimiter.use[IO, String, String](semaphore, () => IO.delay(Gen.toSample(spec).asInstanceOf[ObjectField].asJson.noSpaces))
+      rateLimitedFunction = RateLimiter.use[IO, String](semaphore, () => spec.toJsonSample)
       sample      <- (1 to (appConfig.getInt("rate.events.toGenerate"))).toList.parTraverse(_ => rateLimitedFunction)
       clockGenEnd <- timer.clock.realTime(TimeUnit.MILLISECONDS)
       _           <- IO(println(s"Generation of ${sample.size} taken ${clockGenEnd - clockStart} milliseconds"))
