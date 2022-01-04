@@ -14,9 +14,9 @@ import scala.util.Random
 
 object Gen {
 
-  def from(dataSpec: DataSpec): Field = {
+  def toSample(dataSpec: DataSpec): Field = {
     dataSpec match {
-      case ObjectSpec(name, fields) => ObjectField(name, fields.map(Gen.from))
+      case ObjectSpec(name, fields) => ObjectField(name, fields.map(Gen.toSample))
       case spec: DataSpec.FieldSpec => fromField(spec)
     }
   }

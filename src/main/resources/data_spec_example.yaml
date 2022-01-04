@@ -4,7 +4,7 @@ definitions:
       - name: "Users"
         fields:
           - name: id
-            type: monotonicid
+            type: uuid
           - name: first_name
             type: string
             max_size: 5
@@ -12,7 +12,7 @@ definitions:
             type: string
           - name: type
             type: enum
-            values: ["male","female"]
+            values: [ "male","female" ]
           - name: has_account
             type: bool
           - name: year
@@ -25,7 +25,7 @@ definitions:
             fields:
               - name: country
                 type: enum
-                values: ["Russia", "Italy", "Germany"]
+                values: [ "Russia", "Italy", "Germany" ]
               - name: postal_index
                 type: numeric
                 max_size: 10

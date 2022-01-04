@@ -109,7 +109,7 @@ class GenTest extends AnyFlatSpec with Matchers {
       )
     )
 
-    val obj = Gen.from(spec).asInstanceOf[ObjectField]
+    val obj = Gen.toSample(spec).asInstanceOf[ObjectField]
 
     obj.fields.count(_.name == "nested") shouldBe 1
     obj.fields.size shouldBe 7
