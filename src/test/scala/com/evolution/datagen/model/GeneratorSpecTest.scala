@@ -15,7 +15,7 @@ class GeneratorSpecTest extends AnyFlatSpec with Matchers {
     val yaml =
       """
           |definitions:
-          |    - name: registration_event
+          |    - name: event
           |      fields:
           |        - name: "id"
           |          type: uuid  # or could be monotonic
@@ -24,7 +24,7 @@ class GeneratorSpecTest extends AnyFlatSpec with Matchers {
 
     getFieldSpec(configurationEither, "event") { fields =>
       fields should contain theSameElementsAs List(
-        MonotonicIDFieldSpec("uuid")
+        UUIDFieldSpec("id")
       )
     }
   }
@@ -194,6 +194,7 @@ class GeneratorSpecTest extends AnyFlatSpec with Matchers {
   private def getFieldSpec(genSpec: GeneratorSpec, definition: String)(check: (List[DataSpec]) => Unit): Unit = {
 
     val fields = genSpec.definitions.find(_.name == definition).map(_.fields)
+    fields.size should be > 0
     check(fields.getOrElse(List.empty))
   }
 }
