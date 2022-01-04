@@ -23,7 +23,7 @@ object GeneratorApp extends IOApp {
     for {
       clockStart  <- timer.clock.realTime(TimeUnit.MILLISECONDS)
       semaphore   <- Semaphore[IO](appConfig.getInt("rate.events.perSecond"))
-      rateLimitedFunction = RateLimiter.of(semaphore, () => IO.delay(Gen.toSample(spec).asInstanceOf[ObjectField].asJson.noSpaces))
+      rateLimitedFunction = RateLimiter.use[IO, String, String](semaphore, () => IO.delay(Gen.toSample(spec).asInstanceOf[ObjectField].asJson.noSpaces))
       sample      <- (1 to (appConfig.getInt("rate.events.toGenerate"))).toList.parTraverse(_ => rateLimitedFunction)
       clockGenEnd <- timer.clock.realTime(TimeUnit.MILLISECONDS)
       _           <- IO(println(s"Generation of ${sample.size} taken ${clockGenEnd - clockStart} milliseconds"))
