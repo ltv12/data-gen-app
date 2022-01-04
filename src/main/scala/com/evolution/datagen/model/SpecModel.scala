@@ -18,17 +18,14 @@ object SpecModel {
   final case class GeneratorSpec(definitions: List[ObjectSpec])
 
   object GeneratorSpec {
-    def of(yamlPath: String): IO[ObjectSpec] = {
+    def load(yamlPath: String): ObjectSpec = {
 
       def readConfig =
         GeneratorSpec.fromYaml(
           Source.fromResource(yamlPath).getLines().mkString(System.lineSeparator)
         )
 
-      for {
-        genSpec <- Ref.of[IO, GeneratorSpec](readConfig)
-        dataGen <- genSpec.get.map(_.definitions.head)
-      } yield dataGen
+      readConfig.definitions.head
     }
 
     def fromYaml(yaml: String): GeneratorSpec = {

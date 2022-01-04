@@ -43,15 +43,14 @@ object GeneratorApp extends IOApp {
 
   implicit val appConfig: Config = ConfigFactory.load()
 
-  def process(dataSpecIO: IO[DataSpec]): IO[Nothing] = {
+  def process(dataSpec: DataSpec): IO[Nothing] = {
     (for {
-      dataSpec <- dataSpecIO
-      sample   <- generateData(dataSpec)
-      _        <- toFile(sample)
-    } yield dataSpec).flatMap(spec => process(IO(spec)))
+      sample <- generateData(dataSpec)
+      _      <- toFile(sample)
+    } yield ()) *> IO.suspend(process(dataSpec))
   }
 
   override def run(args: List[String]): IO[ExitCode] = {
-    process(GeneratorSpec.of("data_spec_example.yaml")).as(ExitCode.Success)
+    process(GeneratorSpec.load("data_spec_example.yaml")).as(ExitCode.Success)
   }
 }
