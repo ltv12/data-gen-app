@@ -1,0 +1,31 @@
+definitions:
+  - name: event
+    fields:
+      - name: "User"
+        fields:
+          - name: id
+            type: uuid
+          - name: first_name
+            type: string
+            max_size: 5
+          - name: last_name
+            type: string
+          - name: sex
+            type: enum
+            values: [ "male","female" ]
+          - name: has_account
+            type: bool
+          - name: year
+            type: numeric
+            from: 18
+            to: 75
+          - name: created_at
+            type: timestamp
+          - name: address
+            fields:
+              - name: country
+                type: enum
+                values: [ "Russia", "Italy", "Germany" ]
+              - name: postal_index
+                type: numeric
+                max_size: 10
